@@ -1,0 +1,17 @@
+Computer networking a top-down approach
+
+Tác giả: James F. Kurose, Keith W. Ross
+
+Motivates readers with a top-down, layered approach to computer networking
+
+Unique among computer networking texts, the Seventh Edition of the popular Computer Networking: A Top Down Approach builds on the author’s long tradition of teaching this complex subject through a layered approach in a “top-down manner.” The text works its way from the application layer down toward the physical layer, motivating readers by exposing them to important concepts early in their study of networking. Focusing on the Internet and the fundamentally important issues of networking, this text provides an excellent foundation for readers interested in computer science and electrical engineering, without requiring extensive knowledge of programming or mathematics. The Seventh Edition has been updated to reflect the most important and exciting recent advances in networking.
+
+Chapter 1: Introduction
+Chapter 2: Application Layer
+Chapter 3: Transport Layer
+Chapter 4: Network Data Plane
+Chapter 5: Network Control Plane
+Chapter 6: Link Layer and LANs
+Chapter 7: Wireless and Mobile Networks
+Chapter 8: Network Security
+Chapter 9: Multimedia Networking
