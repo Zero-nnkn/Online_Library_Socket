@@ -25,9 +25,9 @@ insert into ADMINS values('root2', '19120256');
 
 insert into USERS values('knvtt','123');
 
-insert into BOOKS values('T0001','Computer networking a top-down approach', 'James F. Kurose, Keith W. Ross', 'Technology', 'pdf', 'Database\Computer networking a top-down approach.txt');
-insert into BOOKS values('T0002', 'CLean code', 'Robert Martin', 'Technology', 'pdf', 'Database\Clean code.txt');
-insert into BOOKS values('N0001','Tam quoc dien nghia', 'La Quan Trung', 'Novel', 'pdf', 'Database\Tam quoc dien nghia.txt');
+insert into BOOKS values('T0001','Computer networking a top-down approach', 'James F. Kurose, Keith W. Ross', 'Technology', 'txt', 'Database\Computer networking a top-down approach.txt');
+insert into BOOKS values('T0002', 'CLean code', 'Robert Martin', 'Technology', 'txt', 'Database\Clean code.txt');
+insert into BOOKS values('N0001','Tam quoc dien nghia', 'La Quan Trung', 'Novel', 'txt', 'Database\Tam quoc dien nghia.txt');
 
 
 

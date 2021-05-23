@@ -40,7 +40,6 @@ cnxn.close()
 #)''')
 
 import sqlite3
-from codecs import open
 
 '''
 connection = sqlite3.connect('LibraryDB')
@@ -58,18 +57,37 @@ for row in cursor.execute("SELECT * FROM BOOKS"):
 connection.close()
 '''
 
-import Search 
-import View
-import codecs
+import socket
+import threading
+import SignInUp
+import Search
+PORT = 80
 
 connection = sqlite3.connect('LibraryDB')
 cursor = connection.cursor()
 
+def on_new_client(client):
+    while True:
+        message = client.recv(1024).decode('1024')
+        if message == 'SIGNIN':
+            SignInUp.sign_in_click(client,cursor)
+        elif message =='SIGNUP':
+            SignInUp.sign_up_click(client,cursor)
+        elif message == 'SEARCH':
+            Search.search_click(client,cursor)
+
+
+
+serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+serverSocket.bind(("", PORT))
+serverSocket.listen(5)
+print("Waiting for connection...")
+
 while True:
-	s = input('what id books')
-	a = View.view_book(cursor,s)
-	x = open(a,encoding="utf-8")
-	t = x.read()
-	print(t)
+   client, addr = serverSocket.accept()     # Establish connection with client.
+   thread_client = threading.Thread(target=on_new_client,args=(client))
+   thread_client.start()
+
+s.close()
 
     

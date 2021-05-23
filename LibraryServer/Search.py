@@ -1,3 +1,5 @@
+import json
+
 def serch_by_id(cursor,book_id):
     cursor.execute('SELECT Book_ID, Book_name, Author, Book_type, Book_format FROM BOOKS WHERE Book_ID LIKE "%' + book_id + '%"')
     return cursor.fetchall()
@@ -25,6 +27,18 @@ def serch_choice(cursor, searchString):
     elif search_by == 'F_Author':
         result = serch_by_author(cursor,searchString[searchString.find(' ')+1:])
     else:
-        result = 'Error'
+        result = []
     return result
+
+def search_click(client,cursor):
+    while True:
+        buffer = client.recv(1024).decode('utf-8')
+        if buffer=='searchString':
+            searchString = client.recv(1024).decode('utf-8')
+            s = serch_choice(cursor,searchString)
+            dataToSend = json.dumps(s).encode('utf-8') 
+            client.send(dataToSend)
+        else:
+            break
+
     
