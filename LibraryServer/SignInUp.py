@@ -1,7 +1,7 @@
 import json
 
 def sign_in(cursor,username, password):
-    cursor.execute('SELECT * FROM USERS WHERE Username="' + username + '" AND Password=' + password + '"')
+    cursor.execute('SELECT * FROM USERS WHERE Username="' + username + '" AND Password="' + password + '"')
     if cursor.fetchall()==[]:
         return 'Incorrect email address or password'
     else:
@@ -17,6 +17,13 @@ def sign_up(cursor,username, password):
             return 'Error'
     else:
         return 'Account Exists'
+
+def admin_sign_in(cursor,username,password):
+    cursor.execute('SELECT * FROM ADMINS WHERE Username="' + username + '" AND Password="' + password + '"')
+    if cursor.fetchall()==[]:
+        return 'Error'
+    else:
+        return 'Success'
 
 
 def sign_in_click(client, currsor):
