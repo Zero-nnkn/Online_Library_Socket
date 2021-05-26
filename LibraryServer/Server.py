@@ -1,46 +1,14 @@
-'''
-import pyodbc
-
-# Define the server and the database
-server = 'DESKTOP-H8E5RPI\\NNKNSQL'
-database = 'LibraryDB'
-
-# Define the connection string
-cnxn = pyodbc.connect(
-    'DRIVER={ODBC Driver 17 for SQL Server}; \
-    SERVER='+ server +'; \
-    DATABASE='+ database +';\
-    Trusted_Connection=yes;'
-)
-
-# Create the Cursor
-cursor = cnxn.cursor()
-
-cursor.execute('SELECT * from BOOKS')
-for row in cursor:
-    print(row)
-
-cursor.close()
-cnxn.close()
-
-'''
-
-#cursor.execute('CREATE TABLE ADMINS ([Usernames] varchar(20) PRIMARY KEY,[Password] varchar(20))')
-#cursor.execute('''CREATE TABLE USERS(
-#	[Usernames] varchar(20) PRIMARY KEY,
-#	[Passwords] varchar(20)
-#)''')
-#cursor.execute('''CREATE TABLE BOOKS(
-#	[Book_ID] char(5) PRIMARY KEY,
-#	[Book_name] nvarchar(50),
-#	[Author] nvarchar(50),
-#	[Book_type] varchar(30),
-#	[Book_format] char(5),
-#	[Book_link] varchar(50)
-#)''')
-
+import socket
 import sqlite3
+import tkinter as tk
+from tkinter import messagebox
+from tkinter.simpledialog import askstring
+import threading
+import SignInUp
+import Search
+import View
 
+PORT = 80
 '''
 connection = sqlite3.connect('LibraryDB')
 cursor = connection.cursor()
@@ -54,19 +22,9 @@ cursor.executescript(sql_as_string)
 for row in cursor.execute('SELECT * FROM BOOKS'):
     print(row)
 
+connection.commit()
 connection.close()
 '''
-
-import socket
-import tkinter as tk
-from tkinter import messagebox
-import threading
-import SignInUp
-import Search
-PORT = 80
-
-connection = sqlite3.connect('LibraryDB')
-cursor = connection.cursor()
 
 def on_new_client(client):
     while True:
@@ -83,7 +41,7 @@ def on_new_client(client):
 #99cc66
 #669966
 serverSocket = None
-class ServerLogin():
+class Server_login_GUI():
     def __init__(self,root):
             self.root=root
             self.root.title('ONLINE LIBRARY ADMIN')
@@ -92,7 +50,6 @@ class ServerLogin():
             self.root.resizable(False,False)
             self.root.grab_set()
             self.create_widgets()
-
 
     def create_widgets(self):
         self.Login_label = tk.Label(self.root, width=35, height=4, text='Library manage system', font=('Elephant', 32, 'bold'), bg='#FFCC00', fg = '#0066CC')
@@ -134,15 +91,17 @@ class ServerLogin():
                 connection.close()
                 self.root.withdraw()
                 root = tk.Toplevel()
-                sp = ServerProcess(root)
+                sp = Server_control(root)
                 root.mainloop()
 
-
-                
-class ServerProcess():    
+        
+class Server_control():    
     def __init__(self,root):
         self.root=root
         self.my_clients = []
+        self.server_socket = None
+        self.connection = sqlite3.connect('LibraryDB')
+        self.cursor = self.connection.cursor()
         self.root.title('ONLINE LIBRARY SERVER')
         self.root.geometry('720x560+200+100')
         self.root.config(bg='#99cc66')
@@ -157,7 +116,7 @@ class ServerProcess():
         self.frame=tk.Frame(self.root)
         self.frame.place(x=170,y=120,width=380,height=400)
 
-        self.open_but = tk.Button(self.root,text='Open Server',bg='#0099FF',activebackground='#0066FF',activeforeground='white',fg='white',font=('Arial Rounded MT Bold',15,'bold'), command=lambda:self.connect_click())
+        self.open_but = tk.Button(self.root,text='Open Server',bg='#0099FF',activebackground='#0066FF',activeforeground='white',fg='white',font=('Arial Rounded MT Bold',15,'bold'), command=lambda:self.open_click())
         self.open_but.place(x=240,y=210,height=90,width=240)
 
         self.open_but = tk.Button(self.root,text='Disconnect All',bg='#FF3366',activebackground='#CC3366',activeforeground='white',fg='white',font=('Arial Rounded MT Bold',15,'bold'), command=lambda:self.disconnect_click())
@@ -176,34 +135,49 @@ class ServerProcess():
             serverSocket.close()
         else:
              tk.messagebox.showinfo('Return','You will now return to the application screen')
-
-
-
-        
-
-         
-
-        
-
-        
-
-
-
-
-root = tk.Tk()
-app = ServerLogin(root)
-root.mainloop()
-'''
-serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-serverSocket.bind(('', PORT))
-serverSocket.listen(5)
-print('Waiting for connection...')
-
-while True:
-   client, addr = serverSocket.accept()     # Establish connection with client.
-   thread_client = threading.Thread(target=on_new_client,args=(client))
-   thread_client.start()
-
-s.close()
-'''
     
+    def open_click(self):
+        self.max_clients = askstring('Max clients', 'What is the maximum number of clients you want to connect to?')
+        try:
+            self.server_socket.bind(("", PORT))
+            serverSocket.listen(5)
+        except socket.error as e:
+            print(str(e))
+
+        print('Waiting for connection...')
+        while True:
+            client, addr = self.server_socket.accept()
+            if len(self.my_clients) >= self.max_clients:
+                client.send("The library is overloaded".encode('utf-8'))
+                client.close()
+                continue
+            client.send("Welcome to the library".encode('utf-8'))
+            self.max_clients += [client]
+            new_thread = threading.Thread(lambda:self.thread_client(client))
+            new_thread.daemon = True
+            new_thread.start()
+
+    def thread_client(self,client):
+        while True:
+            message = client.recv(1024).encode('utf-8')
+            if message == 'SIGNIN':
+                SignInUp.sign_in_click(client,self.cursor)
+            elif message == 'SIGNUP':
+                SignInUp.SignInUp.sign_up_click(client,self.cursor)
+                connection.commit()
+            elif message == 'SEARCH':
+                Search.search_click(client,self.cursor)
+            elif message == 'VIEW':
+                View.view_click(client,self.cursor)
+            elif message == 'DOWNLOAD':
+                View.view_click(client,self.cursor)
+            elif message == 'SIGNOUT':
+                self.my_clients.remove(client)
+                client.close()
+            else:
+                break
+                
+root = tk.Tk()
+app = Server_login_GUI(root)
+root.mainloop()
+        

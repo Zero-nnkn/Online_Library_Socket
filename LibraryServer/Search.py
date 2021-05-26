@@ -31,14 +31,10 @@ def serch_choice(cursor, searchString):
     return result
 
 def search_click(client,cursor):
-    while True:
-        buffer = client.recv(1024).decode('utf-8')
-        if buffer=='searchString':
-            searchString = client.recv(1024).decode('utf-8')
-            s = serch_choice(cursor,searchString)
-            dataToSend = json.dumps(s).encode('utf-8') 
-            client.send(dataToSend)
-        else:
-            break
+    buffer = client.recv(1024).decode('utf-8')
+    searchString = client.recv(1024).decode('utf-8')
+    s = serch_choice(cursor,searchString)
+    dataToSend = json.dumps(s).encode('utf-8') 
+    client.send(dataToSend)
 
     

@@ -30,10 +30,12 @@ def sign_in_click(client, currsor):
     info = client.recv(1024)
     info = json.loads(info.decode("utf-8"))
     s = sign_in(currsor,info[0],info[1])
+    #show info
     client.send(s)
 
 def sign_up_click(client,cursor):
     info = client.recv(1024)
     info = json.loads(info.decode("utf-8"))
     s = sign_up(cursor,info[0],info[1])
+    #show info
     client.send(s)
